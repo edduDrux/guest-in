@@ -4,12 +4,26 @@ import { prisma } from "../../../lib/prisma";
 // Adiciona um novo inquilino (método POST)
 export async function POST(request: Request) {
   try {
-    const { nome, email, telefone, cpf, dataNascimento } = await request.json();
+    const { nome, email, telefone, cpf, dataNascimento, imovelId } = await request.json();
 
-    if (!nome || !email || !cpf || !dataNascimento) {
-      return NextResponse.json({ error: "Nome, e-mail, CPF e data de nascimento são obrigatórios." }, { status: 400 });
+    // Verifica se os campos obrigatórios estão preenchidos
+    if (!nome || !email || !cpf || !dataNascimento || !imovelId) {
+      return NextResponse.json(
+        { error: "Nome, e-mail, CPF, data de nascimento e ID do imóvel são obrigatórios." },
+        { status: 400 }
+      );
     }
 
+    // Verifica se o imóvel existe
+    const imovel = await prisma.imovel.findUnique({
+      where: { id: imovelId },
+    });
+
+    if (!imovel) {
+      return NextResponse.json({ error: "Imóvel não encontrado." }, { status: 404 });
+    }
+
+    // Verifica se o e-mail ou CPF já estão cadastrados
     const existingInquilino = await prisma.inquilino.findFirst({
       where: {
         OR: [{ email }, { cpf }],
@@ -17,12 +31,17 @@ export async function POST(request: Request) {
     });
 
     if (existingInquilino) {
-      return NextResponse.json({ error: "E-mail ou CPF já cadastrado." }, { status: 400 });
+      return NextResponse.json(
+        { error: "E-mail ou CPF já cadastrado." },
+        { status: 400 }
+      );
     }
 
+    // Gera uma senha temporária com os primeiros 4 dígitos do CPF
     const senhaGerada = cpf.slice(0, 4);
     const dataNascimentoDate = new Date(dataNascimento);
 
+    // Cria o novo inquilino vinculado ao imóvel
     const novoInquilino = await prisma.inquilino.create({
       data: {
         nome,
@@ -31,6 +50,7 @@ export async function POST(request: Request) {
         cpf,
         dataNascimento: dataNascimentoDate,
         senha: senhaGerada,
+        imovelId,
         isFirstLogin: true,
       },
     });
@@ -38,17 +58,29 @@ export async function POST(request: Request) {
     return NextResponse.json(novoInquilino, { status: 201 });
   } catch (error) {
     console.error("Erro ao cadastrar inquilino:", error);
-    return NextResponse.json({ error: "Erro interno ao cadastrar inquilino." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erro interno ao cadastrar inquilino." },
+      { status: 500 }
+    );
   }
 }
 
 // Lista todos os inquilinos (método GET)
 export async function GET() {
   try {
-    const inquilinos = await prisma.inquilino.findMany();
+    // Busca todos os inquilinos e inclui os detalhes do imóvel vinculado
+    const inquilinos = await prisma.inquilino.findMany({
+      include: {
+        imovel: true, // Inclui os detalhes do imóvel
+      },
+    });
+
     return NextResponse.json(inquilinos, { status: 200 });
   } catch (error) {
     console.error("Erro ao buscar inquilinos:", error);
-    return NextResponse.json({ error: "Erro ao buscar inquilinos." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erro ao buscar inquilinos." },
+      { status: 500 }
+    );
   }
 }

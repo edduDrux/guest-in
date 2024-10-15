@@ -22,7 +22,44 @@ model Proprietario {
 
   accounts            Account[]
   sessions            Session[]
-  imoveis             Imovel[]     // Relacionamento com Imovel
+  imoveis             Imovel[]     @relation("ProprietarioImoveis") // Correção: Nome do relacionamento
+}
+
+model Imovel {
+  id             Int       @id @default(autoincrement())
+  nomeImovel     String
+  tipoPropriedade String
+  rua            String?   // Temporariamente opcional
+  numero         String?   // Temporariamente opcional
+  cep            String?   // Temporariamente opcional
+  bairro         String?   // Temporariamente opcional
+  cidade         String?   // Temporariamente opcional
+  tamanho        String
+  proprietarioId Int
+
+  proprietario   Proprietario @relation("ProprietarioImoveis", fields: [proprietarioId], references: [id])
+  inquilinos     Inquilino[]  
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+
+model Inquilino {
+  id              Int       @id @default(autoincrement())
+  nome            String
+  email           String    @unique
+  telefone        String?
+  cpf             String    @unique
+  dataNascimento  DateTime
+  senha           String
+  isFirstLogin    Boolean   @default(true)
+
+  imovel          Imovel?   @relation(fields: [imovelId], references: [id]) 
+  imovelId        Int?      
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model Account {
@@ -39,7 +76,7 @@ model Account {
   id_token           String?
   session_state      String?
 
-  user Proprietario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Proprietario @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -50,7 +87,7 @@ model Session {
   userId       Int
   expires      DateTime
 
-  user Proprietario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Proprietario @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -71,30 +108,3 @@ model Funcionario {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-model Inquilino {
-  id              Int      @id @default(autoincrement())
-  nome            String
-  email           String   @unique
-  telefone        String?
-  cpf             String   @unique
-  dataNascimento  DateTime
-  senha           String
-  isFirstLogin    Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model Imovel {
-  id             Int          @id @default(autoincrement())
-  nomeImovel     String
-  tipoPropriedade String
-  endereco       String
-  tamanho        String
-  proprietario   Proprietario @relation(fields: [proprietarioId], references: [id])
-  proprietarioId Int
-
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-}
-

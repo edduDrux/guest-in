@@ -28,15 +28,6 @@ async function main() {
   });
 
   // Exemplo de Imovel
-  await prisma.imovel.create({
-    data: {
-      nomeImovel: 'Apartamento 101',
-      tipoPropriedade: 'Residencial',
-      endereco: 'Rua do Imovel, 456',
-      tamanho: '120m2',
-      proprietarioId: 1, // ID do proprietário criado acima
-    },
-  });
 }
 
 main()
