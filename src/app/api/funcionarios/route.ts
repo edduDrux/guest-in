@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -27,8 +26,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'E-mail já cadastrado.' }, { status: 400 });
     }
 
-    // Hash da senha
-    const hashedPassword = await bcrypt.hash(senha, 10);
 
     // Salvar funcionário no banco de dados
     const funcionario = await prisma.funcionario.create({
@@ -36,7 +33,7 @@ export async function POST(request: Request) {
         nome,
         email,
         telefone,
-        senha: hashedPassword,
+        senha,
       },
     });
 
