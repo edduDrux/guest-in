@@ -29,6 +29,7 @@ export default function ImoveisPage() {
 
         const data = await response.json();
         setImoveis(data); // Armazena os imóveis no estado
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError("Erro ao carregar imóveis.");
       }

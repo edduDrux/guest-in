@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       tamanho,
     } = await request.json();
 
-    // Validação básica
+    // Verifica se todos os campos obrigatórios estão preenchidos
     if (!nomeImovel || !tipoPropriedade || !rua || !numero || !cep || !bairro || !cidade || !tamanho) {
       return NextResponse.json(
         { error: 'Todos os campos são obrigatórios.' },
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         bairro,
         cidade,
         tamanho,
-        proprietarioId: 1, // Ajuste esse valor para obter o proprietário correto.
+        proprietarioId: 1, // Ajuste conforme necessário para o proprietário.
       },
     });
 
@@ -51,15 +51,13 @@ export async function POST(request: Request) {
 // Lista todos os imóveis (método GET)
 export async function GET() {
   try {
-    // Busca todos os imóveis no banco de dados com inquilinos e proprietário
     const imoveis = await prisma.imovel.findMany({
       include: {
         proprietario: true, // Inclui detalhes do proprietário
-        inquilinos: true,   // Inclui os inquilinos vinculados ao imóvel
+        inquilinos: true,   // Inclui os inquilinos vinculados
       },
     });
 
-    // Retorna os imóveis como JSON
     return NextResponse.json(imoveis, { status: 200 });
   } catch (error) {
     console.error('Erro ao buscar imóveis:', error);

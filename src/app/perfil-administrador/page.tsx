@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import CadastroFuncionarioModal from './CadastroFuncionarioModal';
-import CadastroInquilinoModal from './CadastroInquilinoModal';
 import CadastroImovelModal from './CadastroImovelModal';
+import CadastroInquilinoModal from './CadastroInquilinoModal';
+import UploadFileModal from './UploadFileModal';
 
 export default function PerfilAdministrador() {
   const [isFuncionarioModalOpen, setFuncionarioModalOpen] = useState(false);
   const [isInquilinoModalOpen, setInquilinoModalOpen] = useState(false);
   const [isImovelModalOpen, setImovelModalOpen] = useState(false);
+  const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const router = useRouter();
 
   return (
@@ -19,6 +21,7 @@ export default function PerfilAdministrador() {
           Perfil do Administrador
         </h1>
 
+        {/* Botões de Cadastro */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <button
             onClick={() => setInquilinoModalOpen(true)}
@@ -40,7 +43,8 @@ export default function PerfilAdministrador() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+        {/* Botões de Visualização e Upload */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
           <button
             onClick={() => router.push('/inquilinos')}
             className="bg-gradient-to-r from-purple-400 to-purple-600 text-white p-4 rounded-lg shadow-lg transform transition hover:scale-105 hover:shadow-xl"
@@ -52,6 +56,27 @@ export default function PerfilAdministrador() {
             className="bg-gradient-to-r from-teal-400 to-teal-600 text-white p-4 rounded-lg shadow-lg transform transition hover:scale-105 hover:shadow-xl"
           >
             Visualizar Imóveis
+          </button>
+          <button
+            onClick={() => router.push('/manutencoes')}
+            className="bg-gradient-to-r from-red-400 to-red-600 text-white p-4 rounded-lg shadow-lg transform transition hover:scale-105 hover:shadow-xl"
+          >
+            Visualizar Manutenções
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
+          <button
+            onClick={() => setUploadModalOpen(true)}
+            className="bg-gradient-to-r from-indigo-400 to-indigo-600 text-white p-4 rounded-lg shadow-lg transform transition hover:scale-105 hover:shadow-xl"
+          >
+            Fazer Upload de Arquivo
+          </button>
+          <button
+            onClick={() => router.push('/visualizar-arquivos')}
+            className="bg-gradient-to-r from-orange-400 to-orange-600 text-white p-4 rounded-lg shadow-lg transform transition hover:scale-105 hover:shadow-xl"
+          >
+            Visualizar Arquivos
           </button>
         </div>
       </div>
@@ -70,6 +95,13 @@ export default function PerfilAdministrador() {
       {isImovelModalOpen && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
           <CadastroImovelModal onClose={() => setImovelModalOpen(false)} />
+        </div>
+      )}
+
+      {/* Modal de Upload */}
+      {isUploadModalOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+          <UploadFileModal onClose={() => setUploadModalOpen(false)} />
         </div>
       )}
     </div>

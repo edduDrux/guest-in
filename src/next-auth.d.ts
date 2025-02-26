@@ -1,5 +1,4 @@
-import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import { DefaultSession, DefaultUser } from "next-auth";
 
 // Atualiza as definições de tipos para lidar com diferentes roles
 declare module "next-auth" {
