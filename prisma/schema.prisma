@@ -25,25 +25,37 @@ model Proprietario {
   imoveis             Imovel[]     @relation("ProprietarioImoveis") // Correção: Nome do relacionamento
 }
 
+model Manutencao {
+  id            Int      @id @default(autoincrement())
+  titulo        String
+  comodo        String
+  descricao     String
+  imovelId      Int      // Relacionamento com Imovel
+  inquilinoId   Int      // Relacionamento com Inquilino
+  imovel        Imovel   @relation(fields: [imovelId], references: [id])
+  inquilino     Inquilino @relation(fields: [inquilinoId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Imovel {
   id             Int       @id @default(autoincrement())
   nomeImovel     String
   tipoPropriedade String
-  rua            String?   // Temporariamente opcional
-  numero         String?   // Temporariamente opcional
-  cep            String?   // Temporariamente opcional
-  bairro         String?   // Temporariamente opcional
-  cidade         String?   // Temporariamente opcional
+  rua            String?
+  numero         String?
+  cep            String?
+  bairro         String?
+  cidade         String?
   tamanho        String
   proprietarioId Int
-
   proprietario   Proprietario @relation("ProprietarioImoveis", fields: [proprietarioId], references: [id])
-  inquilinos     Inquilino[]  
+  inquilinos     Inquilino[]
+  manutencoes    Manutencao[]  // Relacionamento com as manutenções
 
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 }
-
 
 model Inquilino {
   id              Int       @id @default(autoincrement())
@@ -54,9 +66,9 @@ model Inquilino {
   dataNascimento  DateTime
   senha           String
   isFirstLogin    Boolean   @default(true)
-
-  imovel          Imovel?   @relation(fields: [imovelId], references: [id]) 
-  imovelId        Int?      
+  imovelId        Int?
+  imovel          Imovel?   @relation(fields: [imovelId], references: [id])
+  manutencoes     Manutencao[] // Relacionamento com Manutencao
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -107,4 +119,11 @@ model Funcionario {
   senha     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Arquivo {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  url       String   // URL do arquivo armazenado
+  createdAt DateTime @default(now())
 }
